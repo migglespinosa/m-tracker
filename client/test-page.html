@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Test Page</title>
+    </head>
+
+    <body>
+
+        <h1>Test page</h1>
+
+        <button onclick="m_tracker.track(['track', 'button_1'])">Button 1</button><br />
+        <button onclick="m_tracker.track(['track1', 'button_2'])">Button 2</button><br />
+        <button onclick="m_tracker.track(['track1'])">Button 3</button><br />
+        <button onclick="m_tracker.view_batch()">View Batch</button><br />
+
+        <script type="text/javascript">
+            
+            //load script asynchronously
+            (function() {
+            
+            var tracker = document.createElement("script"); tracker.type = "text/javascript"; 
+            tracker.async = true;
+
+            //enter url of script here
+            tracker.src = "tracking_object.js";
+            tracker.onload = function(){
+                m_tracker = M_tracker({
+                    api_key : "correct_key", 
+                    add_tracking: true,
+                    account_number: '124352'
+                });
+            };
+            var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(tracker, s);
+            })();
+
+        </script> 
+
+    </body>
+</html>
