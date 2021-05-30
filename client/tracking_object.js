@@ -1,35 +1,21 @@
 const M_tracker = function(init){
 
-    let batch = []; 
     let add_tracking = init.add_tracking;
     let account_number = init.account_number;
 
-    //Open Websocket connection
+    let batch = [];
+    const url = 'ws://localhost:8080';
+    const socket = new WebSocket(url); //Open WebSocket connection
 
-    //Batching logic (Requests are event-driven):
-    //1. Element is added to the batch
-        //a. If push method is not locked, copy element to batch_stage
-        //b. Else, keep element in batch
-    //2. Element is added to batch_stage 
-        //a. If element is the only one in batch_stage, set delay for WebSocket POST request in 10 seconds
-    //3. At 10 seconds
-        //a. Lock push method
-        //b. Perform POST request
-    //4. Await response. 
-        //a. If successful:
-            //i. Clear batch_stage and intersection of batch_stage and batch
-            //ii. Unlock push method
-            //iii. Copy queued elements to batch_stage
-        //b. Else: 
-            //Retry logic
-
-
+    const validInitialization = account_number != null;
+        
     //Account number required
-    if(account_number){  
+    if(validInitialization){  
 
         return {
             //If tracking is enabled and operation is supported, push ['operation', 'descriptor'] to batch
             track : (elem) => {      
+
                 if(!add_tracking){
                     return;
                 }
@@ -38,7 +24,7 @@ const M_tracker = function(init){
                     return;
                 }
 
-                batch.push([elem]);
+                post_batch(elem);
             },
 
             //Enable tracking
@@ -63,7 +49,27 @@ const M_tracker = function(init){
         alert("Account number required!")
         return null;
 
-    }      
+    }
+
+    function post_batch(elem){
+
+        //If batch is empty, send batch to websocket in 30 seconds.
+        if(batch.length == 0){
+            
+            setTimeout(function(){
+
+                socket.send(batch);
+                batch = [];
+                
+            }, 30000);
+
+        }
+
+        batch.push(elem);
+
+    }
+
+
 }
 
 //---------------HELPER DATA-------------------//
