@@ -2,8 +2,9 @@ const M_tracker = function(init){
 
     let add_tracking = init.add_tracking;
     let account_number = init.account_number;
-
     let batch = [];
+    let initial_time = Date.now();
+
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
 
@@ -39,7 +40,7 @@ const M_tracker = function(init){
 
             //----------TEST METHODS-------------//
             view_batch : () => {
-                console.log("Batch :" + batch)
+                console.log(JSON.stringify(batch))
             }
 
         }
@@ -48,6 +49,17 @@ const M_tracker = function(init){
 
         alert("Account number required!")
         return null;
+
+    }
+
+    function format_elem(elem){
+
+        return {
+            method: "POST",
+            url: "/userdata?account_num="+account_number+"&service="+elem[0]+"&tag"+elem[1],
+            timestamp: Date.now(),
+            id: batch.length + 1
+        }
 
     }
 
@@ -65,11 +77,9 @@ const M_tracker = function(init){
 
         }
 
-        batch.push(elem);
+        batch.push(format_elem(elem));
 
     }
-
-
 }
 
 //---------------HELPER DATA-------------------//

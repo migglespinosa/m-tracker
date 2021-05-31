@@ -20,4 +20,5 @@ Batching logic (Requests are event-driven):
             i. Clear batch_stage and intersection of batch_stage and batch
             ii. Unlock push method
         b. Else: 
-            Retry logic
+            Retry logic:
+            Circut breaker pattern? https://docs.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker
