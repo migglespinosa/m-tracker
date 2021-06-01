@@ -70,10 +70,10 @@ const M_tracker = function(init){
             
             setTimeout(function(){
 
-                socket.send(batch);
+                socket.send(JSON.stringify(batch));
                 batch = [];
                 
-            }, 30000);
+            }, 10000);
 
         }
 
