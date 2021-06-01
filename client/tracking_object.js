@@ -3,11 +3,10 @@ const M_tracker = function(init){
     let add_tracking = init.add_tracking;
     let account_number = init.account_number;
     let batch = [];
-    let initial_time = Date.now();
 
+    const load_time = calculate_load_time();
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
-
     const validInitialization = account_number != null;
         
     //Account number required
@@ -41,6 +40,10 @@ const M_tracker = function(init){
             //----------TEST METHODS-------------//
             view_batch : () => {
                 console.log(JSON.stringify(batch))
+            },
+
+            view_loadtime : () => {
+                console.log(load_time)
             }
 
         }
@@ -54,10 +57,13 @@ const M_tracker = function(init){
 
     function format_elem(elem){
 
+        const today = new Date();
+
         return {
             method: "POST",
             url: "/userdata?account_num="+account_number+"&service="+elem[0]+"&tag"+elem[1],
-            timestamp: Date.now(),
+            time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
+            date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
             id: batch.length + 1
         }
 
