@@ -2,13 +2,15 @@ const M_tracker = function(init){
 
     let add_tracking = init.add_tracking;
     let account_number = init.account_number;
+    let add_session_tracking = init.add_session_tracking; 
     let batch = [];
 
-    const load_time = calculate_load_time();
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
     const validInitialization = account_number != null;
-        
+
+    track_session_time();
+
     //Account number required
     if(validInitialization){  
 
@@ -37,13 +39,23 @@ const M_tracker = function(init){
                 add_tracking = false;
             },
 
+            //Enable session time tracking
+            add_session_tracking : () => {
+                add_session_tracking = true;
+            },
+
+            //Enable session time tracking
+            remove_session_tracking : () => {
+                add_session_tracking = false;
+            },
+
             //----------TEST METHODS-------------//
             view_batch : () => {
-                console.log(JSON.stringify(batch))
+                console.log(JSON.stringify(batch));
             },
 
             view_loadtime : () => {
-                console.log(load_time)
+                console.log("Initial load: " + load_time);
             }
 
         }
@@ -65,7 +77,7 @@ const M_tracker = function(init){
             time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
             date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
             id: batch.length + 1
-        }
+        };
 
     }
 
@@ -86,6 +98,32 @@ const M_tracker = function(init){
         batch.push(format_elem(elem));
 
     }
+
+    function track_session_time(){
+
+        let load_time;
+        let unload_time;
+
+        //If add_session_tracking is true, set load_time on load event and unload_time on unload event
+        if(add_session_tracking == true){
+
+            window.addEventListener('load', (event) => {
+
+                load_time = new Date();
+
+            });
+
+            window.addEventListener('beforeunload', (event) => {
+
+                unload_time = new Date();
+                diff = new Date(unload_time-load_time);
+                socket.send(diff.getSeconds());
+
+            });
+
+        }
+    }
+
 }
 
 //---------------HELPER DATA-------------------//
