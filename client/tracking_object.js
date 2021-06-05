@@ -153,7 +153,7 @@ const M_tracker = function(init){
 
     function record_position(event){
 
-        position_batch.push({x: event.pageX, y: event.pageY});
+        position_batch.push([event.pageX, event.pageY]);
 
     }
 
