@@ -13,9 +13,9 @@ const M_tracker = function(init){
 
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
-    const validInitialization = account_number != null;
+    const validInitialization = account_number != null; //Account number required
 
-    //Account number required
+    //If initialization variable 
     if(validInitialization){  
 
         add_session_tracking && track_session_time();
@@ -118,10 +118,7 @@ const M_tracker = function(init){
 
     }
 
-
     function track_session_time(){
-
-        //If add_session_tracking is true, set load_time on load event and unload_time on unload eventgit
 
         window.addEventListener('load', (event) => {
             load_time = new Date();
@@ -134,7 +131,6 @@ const M_tracker = function(init){
         });
 
     }
-
 
     function track_mouse(){
 
@@ -151,6 +147,7 @@ const M_tracker = function(init){
 
     }
 
+    //Callback that pushes [x-coordinate, y-coordinate] to position_batch
     function record_position(event){
 
         position_batch.push([event.pageX, event.pageY]);
