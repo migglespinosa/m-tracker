@@ -11,7 +11,7 @@ socket.on("connection", function(ws){
 
     //If WS message received, output payload data
     ws.on("message", function(message){
-        console.log("Message: "+message)
+        console.log("Message: "+ message)
     });
 
 });
