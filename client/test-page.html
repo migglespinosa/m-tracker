@@ -13,9 +13,9 @@
         <button onclick="m_tracker.track(['track1'])">Button 3</button><br />
         <button onclick="m_tracker.track(['track', 'button_2'])">Button 4</button><br />
         <button onclick="m_tracker.track(['track', 'button_5'])">Button 5</button><br />
-        <button onclick="m_tracker.view_batch()">View Batch</button><br />
+        <button onclick="m_tracker.view_event_data()">View Event Data</button><br />
         <button onclick="m_tracker.view_loadtime()">View Load Time</button><br />
-        <button onclick="m_tracker.view_position_batch()">View Position Batch</button><br />
+        <button onclick="m_tracker.view_position_data()">View Position Data</button><br />
 
         <script type="text/javascript">
             
@@ -30,7 +30,7 @@
             tracker.onload = function(){
                 m_tracker = M_tracker({
                     api_key : "correct_key", 
-                    add_tracking: true,
+                    add_event_tracking: true,
                     add_session_tracking: true,
                     account_number: '124352',
                     add_mouse_tracking: true 

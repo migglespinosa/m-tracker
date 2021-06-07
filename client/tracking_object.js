@@ -1,17 +1,15 @@
-const { send } = require("process");
-
 const M_tracker = function(init){
 
     let account_number = init.account_number;
-    let add_tracking = init.add_tracking;
+    let add_event_tracking = init.add_event_tracking;
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
 
     let load_time;
     let unload_time;
 
-    let event_batch = [];
-    let position_batch = [];
+    let event_data = [];
+    let position_data = [];
 
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
@@ -29,7 +27,7 @@ const M_tracker = function(init){
             //If tracking is enabled and operation is supported, push ['operation', 'descriptor'] to batch
             track : (elem) => {      
 
-                if(!add_tracking){
+                if(!add_event_tracking){
                     return;
                 }
 
@@ -37,17 +35,17 @@ const M_tracker = function(init){
                     return;
                 }
 
-                post_batch(elem);
+                event_data.push(format_elem(elem));
             },
 
             //Enable tracking
-            add_tracking : () => {
-                add_tracking = true;
+            add_event_tracking : () => {
+                add_event_tracking = true;
             },
 
             //Disable tracking
             remove_tracking : () => {
-                add_tracking = false;
+                add_event_tracking = false;
             },
 
             //Enable session time tracking
@@ -71,16 +69,16 @@ const M_tracker = function(init){
             },
 
             //----------TEST METHODS-------------//
-            view_batch : () => {
-                console.log(JSON.stringify(event_batch));
+            view_event_data : () => {
+                console.log(JSON.stringify(event_data));
             },
 
             view_loadtime : () => {
                 console.log("Initial load: " + load_time);
             },
 
-            view_position_batch : () => {
-                console.log("Position batch: "+JSON.stringify(position_batch));
+            view_position_data : () => {
+                console.log("Position batch: "+JSON.stringify(position_data));
             }
         }
     }
@@ -97,33 +95,14 @@ const M_tracker = function(init){
 
         return {
 
-            method: "POST",
-            url: "/userdata?account_num="+account_number+"&service="+elem[0]+"&tag"+elem[1],
+            tag: elem[1],
             time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
             date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
-            id: event_batch.length + 1
+            id: event_data.length + 1 //Change to random #?
 
         };
 
     }
-
-
-    /*
-    function post_batch(elem){
-        //If batch is empty, send batch to websocket in 30 seconds.
-        if(batch.length == 0){
-            
-            setTimeout(function(){
-                socket.send(JSON.stringify(batch));
-                batch = [];
-            }, 10000);
-
-        }
-
-        batch.push(format_elem(elem));
-
-    }
-    */
 
     function track_session_time(){
 
@@ -141,15 +120,10 @@ const M_tracker = function(init){
 
     }
 
+
+    //------------POSITON TRACKING METHODS-------------//
+
     function track_mouse(){
-
-        //REPLACE
-        setInterval(() => {
-            
-            socket.send(JSON.stringify(position_batch));
-            position_batch = [];
-
-        }, 30000);
 
         window.addEventListener('mousemove', record_position);
         window.addEventListener('mouseenter', record_position);
@@ -157,47 +131,58 @@ const M_tracker = function(init){
 
     }
 
-    //Callback that pushes [x-coordinate, y-coordinate] to position_batch
+    //Callback that pushes [x-coordinate, y-coordinate] to position_data
     function record_position(event){
 
-        position_batch.push([event.pageX, event.pageY]);
+        position_data.push([event.pageX, event.pageY]);
 
     }
 
 
     //------------BATCH METHODS------------//
 
-    //NEW FUNCTION-  RUN BATCH()
     function run_batch(){
-        //1. Set interval for websocket send for every 30 seconds
-        //Calllback:
-        //2. Format different arrays
-        //3. Aggregate formatted information
-        //4. Send
-        //5. Clear arrays
 
         setInterval(() => {
 
-            formatRequests();
-            aggregateRequests();
+            let requests = formatRequests();
             socket.send(requests);
             clearRequests();
             
-        }, 30000)
+        }, 10000)
     }
 
     function formatRequests(){
 
-    }
+        let event_post_request;
+        let position_post_request;
 
-    function aggregateRequests(){
+        if(add_event_tracking){
+            event_post_request = {
+                header: "POST /userdata/event_data?account_num=" +account_number+" HTTP/1.1",
+                content_type: "application/http",
+                body: [...event_data]
+            }
+        }
+        
+        if(add_mouse_tracking){
+            position_post_request = {
+                header: "POST /userdata/position_data?account_num=" +account_number+" HTTP/1.1",
+                content_type: "application/http",
+                body: [...position_data]
+            }
+        }
+
+        return [JSON.stringify(event_post_request), JSON.stringify(position_post_request)]
 
     }
 
     function clearRequests(){
-        
-    }
 
+        event_data = [];
+        position_data = [];
+
+    }
 
 }
 
