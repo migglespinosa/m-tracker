@@ -1,3 +1,5 @@
+const { send } = require("process");
+
 const M_tracker = function(init){
 
     let account_number = init.account_number;
@@ -8,7 +10,7 @@ const M_tracker = function(init){
     let load_time;
     let unload_time;
 
-    let batch = [];
+    let event_batch = [];
     let position_batch = [];
 
     const url = 'ws://localhost:8080';
@@ -20,6 +22,8 @@ const M_tracker = function(init){
 
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
+
+        run_batch();
 
         return {
             //If tracking is enabled and operation is supported, push ['operation', 'descriptor'] to batch
@@ -68,7 +72,7 @@ const M_tracker = function(init){
 
             //----------TEST METHODS-------------//
             view_batch : () => {
-                console.log(JSON.stringify(batch));
+                console.log(JSON.stringify(event_batch));
             },
 
             view_loadtime : () => {
@@ -97,12 +101,14 @@ const M_tracker = function(init){
             url: "/userdata?account_num="+account_number+"&service="+elem[0]+"&tag"+elem[1],
             time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
             date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
-            id: batch.length + 1
+            id: event_batch.length + 1
 
         };
 
     }
 
+
+    /*
     function post_batch(elem){
         //If batch is empty, send batch to websocket in 30 seconds.
         if(batch.length == 0){
@@ -117,6 +123,7 @@ const M_tracker = function(init){
         batch.push(format_elem(elem));
 
     }
+    */
 
     function track_session_time(){
 
@@ -127,6 +134,8 @@ const M_tracker = function(init){
         window.addEventListener('beforeunload', (event) => {
             unload_time = new Date();
             diff = new Date(unload_time-load_time);
+
+            //REPLACE
             socket.send(diff.getSeconds());
         });
 
@@ -134,6 +143,7 @@ const M_tracker = function(init){
 
     function track_mouse(){
 
+        //REPLACE
         setInterval(() => {
             
             socket.send(JSON.stringify(position_batch));
@@ -153,6 +163,41 @@ const M_tracker = function(init){
         position_batch.push([event.pageX, event.pageY]);
 
     }
+
+
+    //------------BATCH METHODS------------//
+
+    //NEW FUNCTION-  RUN BATCH()
+    function run_batch(){
+        //1. Set interval for websocket send for every 30 seconds
+        //Calllback:
+        //2. Format different arrays
+        //3. Aggregate formatted information
+        //4. Send
+        //5. Clear arrays
+
+        setInterval(() => {
+
+            formatRequests();
+            aggregateRequests();
+            socket.send(requests);
+            clearRequests();
+            
+        }, 30000)
+    }
+
+    function formatRequests(){
+
+    }
+
+    function aggregateRequests(){
+
+    }
+
+    function clearRequests(){
+        
+    }
+
 
 }
 
