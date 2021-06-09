@@ -5,11 +5,7 @@ const M_tracker = function(init){
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
     let add_bounce_tracking = init.add_bounce_tracking;
-
     let add_exit_tracking = init.add_exit_tracking;
-
-    let load_time;
-    let unload_time;
 
     let event_data = [];
     let position_data = [];
@@ -99,9 +95,12 @@ const M_tracker = function(init){
 
     }
 
-
+    //Track time between site load and unload
     function track_session_time(){
 
+        let load_time;
+        let unload_time;
+    
         window.addEventListener('load', (event) => {
             load_time = new Date();
         });
@@ -114,6 +113,7 @@ const M_tracker = function(init){
 
     }
 
+    //Before window closes, send page sessions to server
     function track_page_session_data(){
 
         window.addEventListener('beforeunload', (event) => {
@@ -122,6 +122,7 @@ const M_tracker = function(init){
 
     }
 
+    //Track mouse position
     function track_mouse(){
 
         window.addEventListener('mousemove', record_position);
