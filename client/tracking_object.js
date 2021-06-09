@@ -169,27 +169,26 @@ const M_tracker = function(init){
 
     function format_requests(){
 
-        let event_post_request;
-        let position_post_request;
+        let formatted_requests = [];
 
         if(add_event_tracking){
-            event_post_request = {
+            formatted_requests.push({
                 header: "POST /userdata/event_data?account_num=" +account_number+" HTTP/1.1",
                 content_type: "application/http",
                 body: [...event_data]
-            }
+            })
         }
         
         if(add_mouse_tracking){
-            position_post_request = {
+            formatted_requests.push({
                 header: "POST /userdata/position_data?account_num=" +account_number+" HTTP/1.1",
                 content_type: "application/http",
                 body: [...position_data]
-            }
+            })
         }
 
-        return [JSON.stringify(event_post_request), JSON.stringify(position_post_request)]
-
+        return formatted_requests;
+        
     }
 
     function clear_requests(){
