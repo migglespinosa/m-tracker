@@ -4,12 +4,15 @@ const M_tracker = function(init){
     let add_event_tracking = init.add_event_tracking;
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
+    let add_bounce_tracking = init.add_bounce_tracking;
+    let add_exit_tracking = init.add_exit_tracking;
 
     let load_time;
     let unload_time;
 
     let event_data = [];
     let position_data = [];
+    let page_session_data = [];
 
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
@@ -20,6 +23,8 @@ const M_tracker = function(init){
 
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
+        add_bounce_tracking && track_bounce();
+        add_exit_tracking && track_exit();
 
         run_batch();
 
@@ -44,7 +49,7 @@ const M_tracker = function(init){
             },
 
             //Disable tracking
-            remove_tracking : () => {
+            remove_event_tracking : () => {
                 add_event_tracking = false;
             },
 
@@ -66,6 +71,11 @@ const M_tracker = function(init){
             //Remove mouse tracking
             remove_mouse_tracking : () => {
                 add_mouse_tracking = false;
+            },
+
+            //Adds a new page to page_session_data
+            track_new_page : (page) => {
+                page_session_data.push(page);
             },
 
             //----------TEST METHODS-------------//
@@ -104,6 +114,14 @@ const M_tracker = function(init){
 
     }
 
+    function track_bounce(){
+
+    }
+
+    function track_exit(){
+
+    }
+
     function track_session_time(){
 
         window.addEventListener('load', (event) => {
@@ -120,9 +138,6 @@ const M_tracker = function(init){
 
     }
 
-
-    //------------POSITON TRACKING METHODS-------------//
-
     function track_mouse(){
 
         window.addEventListener('mousemove', record_position);
@@ -137,7 +152,6 @@ const M_tracker = function(init){
         position_data.push([event.pageX, event.pageY]);
 
     }
-
 
     //------------BATCH METHODS------------//
 
