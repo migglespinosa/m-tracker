@@ -39,36 +39,6 @@ const M_tracker = function(init){
                 event_data.push(format_event(elem));
             },
 
-            //Enable tracking
-            add_event_tracking : () => {
-                add_event_tracking = true;
-            },
-
-            //Disable tracking
-            remove_event_tracking : () => {
-                add_event_tracking = false;
-            },
-
-            //Enable session time tracking
-            add_session_tracking : () => {
-                add_session_tracking = true;
-            },
-
-            //Enable session time tracking
-            remove_session_tracking : () => {
-                add_session_tracking = false;
-            },
-
-            //Enable mouse tracking
-            add_mouse_tracking : () => {
-                add_mouse_tracking = true;
-            },
-
-            //Remove mouse tracking
-            remove_mouse_tracking : () => {
-                add_mouse_tracking = false;
-            },
-
             //Adds a new page to page_session_data
             page_change : (page) => {
                 page_session_data.push(page);
