@@ -23,8 +23,7 @@ const M_tracker = function(init){
 
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
-        add_bounce_tracking && track_bounce();
-        add_exit_tracking && track_exit();
+        add_bounce_tracking || add_exit_tracking && send_page_session_data();
 
         run_batch();
 
@@ -114,14 +113,6 @@ const M_tracker = function(init){
 
     }
 
-    function track_bounce(){
-
-    }
-
-    function track_exit(){
-
-    }
-
     function track_session_time(){
 
         window.addEventListener('load', (event) => {
@@ -157,16 +148,26 @@ const M_tracker = function(init){
 
     function run_batch(){
 
+        //Send data every 30 seconds
         setInterval(() => {
 
-            let requests = formatRequests();
+            let requests = format_requests();
             socket.send(requests);
-            clearRequests();
+            clear_requests();
             
         }, 10000)
+
+        //If page is closed before 30 second interval elapses, send remaining data
+        window.addEventListener('beforeunload', (event) => {
+
+            let requests = format_requests();
+            socket.send(requests);
+
+        });
+
     }
 
-    function formatRequests(){
+    function format_requests(){
 
         let event_post_request;
         let position_post_request;
@@ -191,7 +192,7 @@ const M_tracker = function(init){
 
     }
 
-    function clearRequests(){
+    function clear_requests(){
 
         event_data = [];
         position_data = [];
