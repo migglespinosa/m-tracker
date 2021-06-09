@@ -5,6 +5,7 @@ const M_tracker = function(init){
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
     let add_bounce_tracking = init.add_bounce_tracking;
+
     let add_exit_tracking = init.add_exit_tracking;
 
     let load_time;
@@ -39,7 +40,7 @@ const M_tracker = function(init){
                     return;
                 }
 
-                event_data.push(format_elem(elem));
+                event_data.push(format_event(elem));
             },
 
             //Enable tracking
@@ -98,38 +99,21 @@ const M_tracker = function(init){
 
     }
 
-    function format_elem(elem){
-
-        const today = new Date();
-
-        return {
-
-            tag: elem[1],
-            time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
-            date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
-            id: event_data.length + 1 //Change to random #?
-
-        };
-
-    }
 
     function track_session_time(){
 
         window.addEventListener('load', (event) => {
+
             load_time = new Date();
+
         });
 
         window.addEventListener('beforeunload', (event) => {
+
             unload_time = new Date();
             diff = new Date(unload_time-load_time);
+            socket.send(JSON.stringify(format_session_time(diff)));
 
-            const formatted_session_time_data = {
-                header: "POST /userdata/session_time?account_num=" +account_number+" HTTP/1.1",
-                content_type: "application/http",
-                body: diff.getSeconds()
-            }
-            
-            socket.send(JSON.stringify(formatted_session_time_data));
         });
 
     }
@@ -138,19 +122,7 @@ const M_tracker = function(init){
 
         window.addEventListener('beforeunload', (event) => {
 
-            const page_session_data = {
-                exit_time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
-                exit_date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(), 
-                page_session: [page_session_data]
-            };
-
-            const formatted_page_session_data = {
-                header: "POST /userdata/page_session_data?account_num=" +account_number+" HTTP/1.1",
-                content_type: "application/http",
-                body:  page_session_data
-            };
-        
-            socket.send(JSON.stringify(formatted_page_session_data));
+            socket.send(JSON.stringify(format_page_session_data));
 
         });
 
@@ -194,6 +166,15 @@ const M_tracker = function(init){
 
     }
 
+    function clear_requests(){
+
+        event_data = [];
+        position_data = [];
+
+    }
+
+    //------------FORMATTING METHODS--------------//
+
     function format_requests(){
 
         let formatted_requests = [];
@@ -218,10 +199,44 @@ const M_tracker = function(init){
         
     }
 
-    function clear_requests(){
+    function format_event(elem){
 
-        event_data = [];
-        position_data = [];
+        const today = new Date();
+
+        return {
+
+            tag: elem[1],
+            time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
+            date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
+            id: event_data.length + 1 //Change to random #?
+
+        };
+
+    }
+
+    function format_session_time(time){
+
+        return {
+            header: "POST /userdata/session_time?account_num=" +account_number+" HTTP/1.1",
+            content_type: "application/http",
+            body: time.getSeconds()
+        }
+
+    }
+
+    function format_page_session_data(){
+
+        const page_session_data = {
+            exit_time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
+            exit_date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(), 
+            page_session: [page_session_data]
+        };
+
+        return {
+            header: "POST /userdata/page_session_data?account_num=" +account_number+" HTTP/1.1",
+            content_type: "application/http",
+            body: page_session_data
+        }
 
     }
 
