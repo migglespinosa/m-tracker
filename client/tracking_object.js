@@ -103,17 +103,13 @@ const M_tracker = function(init){
     function track_session_time(){
 
         window.addEventListener('load', (event) => {
-
             load_time = new Date();
-
         });
 
         window.addEventListener('beforeunload', (event) => {
-
             unload_time = new Date();
             diff = new Date(unload_time-load_time);
             socket.send(JSON.stringify(format_session_time(diff)));
-
         });
 
     }
@@ -121,9 +117,7 @@ const M_tracker = function(init){
     function track_page_session_data(){
 
         window.addEventListener('beforeunload', (event) => {
-
             socket.send(JSON.stringify(format_page_session_data));
-
         });
 
     }
@@ -149,19 +143,15 @@ const M_tracker = function(init){
 
         //Send data every 30 seconds
         setInterval(() => {
-
             let requests = format_requests();
             socket.send(requests);
             clear_requests();
-            
         }, 10000)
 
         //If page is closed before 30 second interval elapses, send remaining data
         window.addEventListener('beforeunload', (event) => {
-
             let requests = format_requests();
             socket.send(requests);
-
         });
 
     }
@@ -204,12 +194,10 @@ const M_tracker = function(init){
         const today = new Date();
 
         return {
-
             tag: elem[1],
             time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
             date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
             id: event_data.length + 1 //Change to random #?
-
         };
 
     }
