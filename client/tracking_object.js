@@ -23,7 +23,7 @@ const M_tracker = function(init){
 
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
-        add_bounce_tracking || add_exit_tracking && send_page_session_data();
+        add_bounce_tracking || add_exit_tracking && track_page_session_data();
 
         run_batch();
 
@@ -73,7 +73,7 @@ const M_tracker = function(init){
             },
 
             //Adds a new page to page_session_data
-            track_new_page : (page) => {
+            page_change : (page) => {
                 page_session_data.push(page);
             },
 
@@ -123,8 +123,35 @@ const M_tracker = function(init){
             unload_time = new Date();
             diff = new Date(unload_time-load_time);
 
-            //REPLACE
-            socket.send(diff.getSeconds());
+            const formatted_session_time_data = {
+                header: "POST /userdata/session_time?account_num=" +account_number+" HTTP/1.1",
+                content_type: "application/http",
+                body: diff.getSeconds()
+            }
+            
+            socket.send(JSON.stringify(formatted_session_time_data));
+        });
+
+    }
+
+    function track_page_session_data(){
+
+        window.addEventListener('beforeunload', (event) => {
+
+            const page_session_data = {
+                exit_time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
+                exit_date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(), 
+                page_session: [page_session_data]
+            };
+
+            const formatted_page_session_data = {
+                header: "POST /userdata/page_session_data?account_num=" +account_number+" HTTP/1.1",
+                content_type: "application/http",
+                body:  page_session_data
+            };
+        
+            socket.send(JSON.stringify(formatted_page_session_data));
+
         });
 
     }
