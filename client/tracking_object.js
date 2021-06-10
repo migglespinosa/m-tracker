@@ -10,7 +10,7 @@ const M_tracker = function(init){
     let event_data = [];
     let position_data = [];
     let page_session_data = [];
-
+   
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
     const validInitialization = account_number != null; //Account number required
@@ -195,6 +195,18 @@ const M_tracker = function(init){
             header: "POST /userdata/page_session_data?account_num=" +account_number+" HTTP/1.1",
             content_type: "application/http",
             body: page_session_data
+        }
+
+    }
+
+
+    //Finish logic for individual page views
+    function format_page_session_element(page){
+
+        return {
+            open_time: "",
+            close_time: "",
+            page: page,
         }
 
     }
