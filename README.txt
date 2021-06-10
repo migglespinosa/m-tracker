@@ -5,11 +5,37 @@ M-tracker requirements:
 
 Two possible data structures:
 
-- An array called site_session
+- An array (or object?) called site_session
 - Each element in site_session represents a page_session
 - Page_session is an object with properties:
     - Position data
     - Event data
     - Load time 
-    - Exit time
+    - Unload time
     - Unique ID?
+
+Keep in mind the backend:
+- Because we're ingesting analytics data, we'd use a flexible non-relational database -> MongoDB? (Document-based data)
+
+Helpful links:
+https://www.mongodb.com/nosql-explained/data-modeling
+https://docs.mongodb.com/manual/core/data-model-design/
+
+Non-relational DB Design:
+
+Collections: 
+- Accounts -Site_Sessions -Page_Sessions -EventData?
+
+Site_Sessions = {
+    _id: unique_val,
+    account: accounts._id
+    load: [time],
+    unload: [time],
+    page_sessions: Array or Map of page_session objects //????
+}
+
+Page_Sessions = {
+    _id: unique_val
+    site_session: site_sessions_.ID
+    event_data: 
+}

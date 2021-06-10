@@ -10,7 +10,9 @@ const M_tracker = function(init){
     let event_data = [];
     let position_data = [];
     let page_session_data = [];
-   
+
+    //INSERT: Default current page
+
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
     const validInitialization = account_number != null; //Account number required
@@ -35,12 +37,17 @@ const M_tracker = function(init){
                 if(!supportedOperation(elem)){
                     return;
                 }
-
+                //REFACTOR: Push to current page in site_session
                 event_data.push(format_event(elem));
             },
 
             //Adds a new page to page_session_data
             page_change : (page) => {
+
+                //REFACTOR: 
+                // -Changes current page on session
+                // -Sets unload time to previous current page
+                // -Sets load time to current page
                 page_session_data.push(page);
             },
 
@@ -104,6 +111,7 @@ const M_tracker = function(init){
     //Callback that pushes [x-coordinate, y-coordinate] to position_data
     function record_position(event){
 
+        //REFACTOR: Push to current page in site_session
         position_data.push([event.pageX, event.pageY]);
 
     }
@@ -113,6 +121,7 @@ const M_tracker = function(init){
     function run_batch(){
 
         //Send data every 30 seconds
+        //REFACTOR: Sends all data in page_session. Also clears all data except load time and unique ID in current page
         setInterval(() => {
             let requests = format_requests();
             socket.send(requests);
