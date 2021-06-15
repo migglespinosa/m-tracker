@@ -4,12 +4,11 @@ const M_tracker = function(init){
     let add_event_tracking = init.add_event_tracking;
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
-    let add_bounce_tracking = init.add_bounce_tracking;
-    let add_exit_tracking = init.add_exit_tracking;
 
     let event_data = [];
     let position_data = [];
-    let page_session_data = [];
+    let site_session_data = [];
+    let page_session_data; //SHOULD BE OBJECT?
 
     //INSERT: Default current page
 
@@ -22,8 +21,8 @@ const M_tracker = function(init){
 
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
-        add_bounce_tracking || add_exit_tracking && track_page_session_data();
 
+        track_site_session_data();
         run_batch();
 
         return {
@@ -97,6 +96,21 @@ const M_tracker = function(init){
             socket.send(JSON.stringify(format_page_session_data));
         });
 
+    }
+
+    function track_site_session_data(page){
+
+        const today = new Date();
+        const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+        page_session_data = {
+            load_time: time + ' ' + date,
+            unload_time: '',
+            event_data: [],
+            position_data: []
+        };
+        
     }
 
     //Track mouse position
@@ -207,20 +221,6 @@ const M_tracker = function(init){
         }
 
     }
-
-    /*
-
-    //Finish logic for individual page views
-    function format_page_session_element(page){
-
-        return {
-            open_time: "",
-            close_time: "",
-            page: page,
-        }
-
-    }
-    */
 
 }
 
