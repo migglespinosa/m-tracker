@@ -124,6 +124,8 @@ const M_tracker = function(init){
         //REFACTOR: Sends all data in page_session. Also clears all data except load time and unique ID in current page
         setInterval(() => {
             let requests = format_requests();
+            console.log("typeof(requests)" + typeof(requests));
+            console.log("Requests: " + requests);
             socket.send(requests);
             clear_requests();
         }, 10000)
@@ -165,7 +167,7 @@ const M_tracker = function(init){
             })
         }
 
-        return formatted_requests;
+        return JSON.stringify(formatted_requests);
         
     }
 
@@ -208,6 +210,7 @@ const M_tracker = function(init){
 
     }
 
+    /*
 
     //Finish logic for individual page views
     function format_page_session_element(page){
@@ -219,6 +222,7 @@ const M_tracker = function(init){
         }
 
     }
+    */
 
 }
 
