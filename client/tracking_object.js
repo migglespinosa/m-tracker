@@ -124,8 +124,6 @@ const M_tracker = function(init){
         //REFACTOR: Sends all data in page_session. Also clears all data except load time and unique ID in current page
         setInterval(() => {
             let requests = format_requests();
-            console.log("typeof(requests)" + typeof(requests));
-            console.log("Requests: " + requests);
             socket.send(requests);
             clear_requests();
         }, 10000)
@@ -151,7 +149,7 @@ const M_tracker = function(init){
 
         let formatted_requests = [];
 
-        if(add_event_tracking){
+        if(event_data.length > 0){
             formatted_requests.push({
                 header: "POST /userdata/event_data?account_num=" +account_number+" HTTP/1.1",
                 content_type: "application/http",
@@ -159,7 +157,7 @@ const M_tracker = function(init){
             })
         }
         
-        if(add_mouse_tracking){
+        if(position_data.length > 0){
             formatted_requests.push({
                 header: "POST /userdata/position_data?account_num=" +account_number+" HTTP/1.1",
                 content_type: "application/http",
