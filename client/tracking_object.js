@@ -5,7 +5,7 @@ const M_tracker = function(init){
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
 
-    let site_session_data = [];
+    let session = new Session();
     let current_page = new Page('Home'); 
 
     //INSERT: Default current page
@@ -33,7 +33,7 @@ const M_tracker = function(init){
                 if(!supportedOperation(elem)){
                     return;
                 }
-                //REFACTOR: Push to current page in site_session
+                
                 current_page.event_data.push(elem);
 
             },
@@ -46,7 +46,7 @@ const M_tracker = function(init){
                 }
                 
                 current_page.unload_time = getCurrentTime();
-                site_session_data.push(current_page);
+                session.push(current_page);
                 current_page = new Page(page);
 
             },
@@ -102,7 +102,6 @@ const M_tracker = function(init){
     //Callback that pushes [x-coordinate, y-coordinate] to position_data
     function record_position(event){
 
-        //REFACTOR: Push to current page in site_session
         current_page.position_data.push([event.pageX, event.pageY]);
 
     }
@@ -112,25 +111,25 @@ const M_tracker = function(init){
     function run_batch(){
 
         //Send data every 30 seconds
-        //REFACTOR: Sends all data in site_session_data. Also clears all data except load time and name in current page
         setInterval(() => {
             let current_page_copy = Object.assign({}, current_page);
-            site_session_data.push(current_page_copy);
-            socket.send(format_session_data(site_session_data));
-            clear_current_page();
+            session.push(current_page_copy);
+            console.log("session "+ JSON.stringify(session));
+            socket.send(format_session_data(session));
+            clear_data();
         }, 10000)
 
         //If page is closed before 30 second interval elapses, send all data
         window.addEventListener('beforeunload', (event) => {
-            site_session_data.push(current_page);
-            socket.send(format_session_data(site_session_data));
+            session.push(current_page);
+            socket.send(format_session_data(session));
         });
 
     }
 
-    function clear_current_page(){
+    function clear_data(){
 
-        site_session_data = [];
+        session.data = [];
         current_page.event_data = [];
         current_page.position_data = [];
 
@@ -168,6 +167,13 @@ const M_tracker = function(init){
         this.event_data = [];
         this.position_data = [];
 
+    }
+
+    function Session(){
+
+        this.load_time = getCurrentTime();
+        this.track_session_time = null;
+        this.data = [];
     }
 
 }
