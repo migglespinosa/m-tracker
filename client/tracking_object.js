@@ -145,43 +145,6 @@ const M_tracker = function(init){
 
     //------------FORMATTING METHODS--------------//
 
-    function format_requests(){
-
-        let formatted_requests = [];
-
-        if(event_data.length > 0){
-            formatted_requests.push({
-                header: "POST /userdata/event_data?account_num=" +account_number+" HTTP/1.1",
-                content_type: "application/http",
-                body: [...event_data]
-            })
-        }
-        
-        if(position_data.length > 0){
-            formatted_requests.push({
-                header: "POST /userdata/position_data?account_num=" +account_number+" HTTP/1.1",
-                content_type: "application/http",
-                body: [...position_data]
-            })
-        }
-
-        return JSON.stringify(formatted_requests);
-        
-    }
-
-    function format_event(elem){
-
-        const today = new Date();
-
-        return {
-            tag: elem[1],
-            time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
-            date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(),
-            id: event_data.length + 1 //Change to random #?
-        };
-
-    }
-
     function format_session_time(time){
 
         return {
