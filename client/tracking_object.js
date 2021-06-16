@@ -90,15 +90,6 @@ const M_tracker = function(init){
 
     }
 
-    //Before window closes, send page sessions to server
-    function track_page_session_data(){
-
-        window.addEventListener('beforeunload', (event) => {
-            socket.send(JSON.stringify(format_page_session_data));
-        });
-
-    }
-
     //Track mouse position
     function track_mouse(){
 
@@ -121,25 +112,27 @@ const M_tracker = function(init){
     function run_batch(){
 
         //Send data every 30 seconds
-        //REFACTOR: Sends all data in page_session. Also clears all data except load time and unique ID in current page
+        //REFACTOR: Sends all data in site_session_data. Also clears all data except load time and name in current page
         setInterval(() => {
-            let requests = format_requests();
-            socket.send(requests);
-            clear_requests();
+            let current_page_copy = Object.assign({}, current_page);
+            site_session_data.push(current_page_copy);
+            socket.send(format_session_data(site_session_data));
+            clear_current_page();
         }, 10000)
 
-        //If page is closed before 30 second interval elapses, send remaining data
+        //If page is closed before 30 second interval elapses, send all data
         window.addEventListener('beforeunload', (event) => {
-            let requests = format_requests();
-            socket.send(requests);
+            site_session_data.push(current_page);
+            socket.send(format_session_data(site_session_data));
         });
 
     }
 
-    function clear_requests(){
+    function clear_current_page(){
 
-        event_data = [];
-        position_data = [];
+        site_session_data = [];
+        current_page.event_data = [];
+        current_page.position_data = [];
 
     }
 
@@ -155,18 +148,12 @@ const M_tracker = function(init){
 
     }
 
-    function format_page_session_data(){
-
-        const page_session_data = {
-            exit_time: today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(),
-            exit_date: today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate(), 
-            page_session: [page_session_data]
-        };
+    function format_session_data(data){
 
         return {
-            header: "POST /userdata/page_session_data?account_num=" +account_number+" HTTP/1.1",
+            header: "POST /userdata/session_data?account_num=" +account_number+" HTTP/1.1",
             content_type: "application/http",
-            body: page_session_data
+            body: data
         }
 
     }
