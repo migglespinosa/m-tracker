@@ -13,6 +13,7 @@ socket.on("connection", function(ws){
     //If WS message received, output payload data
     ws.on("message", function(message){
 
+        console.log("Message: " + JSON.stringify(JSON.parse(message)));
         const worker = new Worker("./tracking-thread.js", {workerData: message});
         worker.on('message', (value) => {console.log("value: " + JSON.stringify(value))} );
         

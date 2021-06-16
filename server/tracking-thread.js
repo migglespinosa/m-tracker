@@ -1,21 +1,25 @@
 const {workerData, parentPort} = require('worker_threads');
 
 //Parse data into JSON
-const batch = JSON.parse(workerData);
+const message = JSON.parse(workerData);
+const session = message.body;
+
 
 //Iterate through batch
-batch.forEach(elem => {
+session.data.forEach(elem => {
 
     //Send data to respective collections in MongoDB
-    if(elem.header.includes("event_data")){
+    if(elem.name.includes("Home")){
         parentPort.postMessage(elem);
     }
 
-    if(elem.header.includes("position_data")){
+    if(elem.name.includes("Page A")){
+        parentPort.postMessage(elem);
+    }
+
+    if(elem.name.includes("Page B")){
         parentPort.postMessage(elem);
     }
     
 })
-
-
 
