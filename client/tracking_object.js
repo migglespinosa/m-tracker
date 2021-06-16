@@ -7,13 +7,11 @@ const M_tracker = function(init){
     let session = new Session();
     let current_page = new Page('Home'); 
 
-    //INSERT: Default current page
-
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
     const validInitialization = account_number != null; //Account number required
 
-    //If initialization variable 
+    //If configured correctly, return object method API
     if(validInitialization){  
 
         add_mouse_tracking && track_mouse();
@@ -79,7 +77,7 @@ const M_tracker = function(init){
 
     }
 
-    //Callback that pushes [x-coordinate, y-coordinate] to position_data
+    //Callback that pushes [x-coordinate, y-coordinate] to current_page.position_data
     function record_position(event){
 
         current_page.position_data.push([event.pageX, event.pageY]);
@@ -90,17 +88,27 @@ const M_tracker = function(init){
 
     function run_batch(){
 
-        //Send data every 30 seconds
+        //Sends data every 30 seconds
         setInterval(() => {
+
+            //1. Copy state of current_page and push into session.data
+            //2. Send session to WebSocket
+            //3. Clear recently posted data to save memory
             let current_page_copy = Object.assign({}, current_page);
             session.data.push(current_page_copy);
             console.log("session "+ JSON.stringify(session));
             socket.send(format_session(session));
             clear_data();
+
+
         }, 10000)
 
-        //If page is closed before 30 second interval elapses, send all data
+        //Sends data when window is closed
         window.addEventListener('beforeunload', (event) => {
+
+            //1. Set unload times for current page and session
+            //2. Push current page to session
+            //3. Send session to WebSocket
             current_page.unload_time = getCurrentTime();
             session.unload_time = getCurrentTime();
             session.data.push(current_page);
@@ -109,6 +117,7 @@ const M_tracker = function(init){
 
     }
 
+    //Clears disposable data
     function clear_data(){
 
         session.data = [];
@@ -117,7 +126,7 @@ const M_tracker = function(init){
 
     }
 
-    //------------FORMATTING METHODS--------------//
+    //-----------------FORMATTING METHODS--------------//
 
     function format_session(data){
 
@@ -129,7 +138,7 @@ const M_tracker = function(init){
 
     }
 
-    //----------------OBJECT METHODS---------------//
+    //----------------OBJECT CONSTRUCTORS---------------//
 
     function Page(name){
 
@@ -174,6 +183,7 @@ function supportedOperation(elem){
     }
 }
 
+//Returns timestamp 
 function getCurrentTime(){
 
     const today = new Date();
