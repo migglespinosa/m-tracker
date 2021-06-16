@@ -5,10 +5,8 @@ const M_tracker = function(init){
     let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
 
-    let event_data = [];
-    let position_data = [];
     let site_session_data = [];
-    let page_session_data; //SHOULD BE OBJECT?
+    let current_page = new Page('Home'); 
 
     //INSERT: Default current page
 
@@ -22,7 +20,6 @@ const M_tracker = function(init){
         add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
 
-        track_site_session_data();
         run_batch();
 
         return {
@@ -32,35 +29,39 @@ const M_tracker = function(init){
                 if(!add_event_tracking){
                     return;
                 }
-
+                
                 if(!supportedOperation(elem)){
                     return;
                 }
                 //REFACTOR: Push to current page in site_session
-                event_data.push(format_event(elem));
+                current_page.event_data.push(elem);
+
             },
 
             //Adds a new page to page_session_data
             page_change : (page) => {
 
-                //REFACTOR: 
-                // -Changes current page on session
-                // -Sets unload time to previous current page
-                // -Sets load time to current page
-                page_session_data.push(page);
+                if(!page){
+                    alert("No page specified");
+                }
+                
+                current_page.unload_time = getCurrentTime();
+                site_session_data.push(current_page);
+                current_page = new Page(page);
+
             },
 
             //----------TEST METHODS-------------//
             view_event_data : () => {
-                console.log(JSON.stringify(event_data));
+                console.log(JSON.stringify(current_page.event_data));
             },
 
             view_loadtime : () => {
-                console.log("Initial load: " + load_time);
+                console.log("Initial load: " + current_page.load_time);
             },
 
             view_position_data : () => {
-                console.log("Position batch: "+JSON.stringify(position_data));
+                console.log("Position batch: "+JSON.stringify(current_page.position_data));
             }
         }
     }
@@ -98,21 +99,6 @@ const M_tracker = function(init){
 
     }
 
-    function track_site_session_data(page){
-
-        const today = new Date();
-        const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-
-        page_session_data = {
-            load_time: time + ' ' + date,
-            unload_time: '',
-            event_data: [],
-            position_data: []
-        };
-        
-    }
-
     //Track mouse position
     function track_mouse(){
 
@@ -126,7 +112,7 @@ const M_tracker = function(init){
     function record_position(event){
 
         //REFACTOR: Push to current page in site_session
-        position_data.push([event.pageX, event.pageY]);
+        current_page.position_data.push([event.pageX, event.pageY]);
 
     }
 
@@ -222,6 +208,18 @@ const M_tracker = function(init){
 
     }
 
+    //----------------OBJECT METHODS---------------//
+
+    function Page(name){
+
+        this.name = name;
+        this.load_time = getCurrentTime();
+        this.unload_time =  null;
+        this.event_data = [];
+        this.position_data = [];
+
+    }
+
 }
 
 //---------------HELPER DATA-------------------//
@@ -246,4 +244,13 @@ function supportedOperation(elem){
         alert("Not supported")
         return false;
     }
+}
+
+function getCurrentTime(){
+
+    const today = new Date();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+    return time + ' ' + date;
 }
