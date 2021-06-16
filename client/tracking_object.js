@@ -2,7 +2,6 @@ const M_tracker = function(init){
 
     let account_number = init.account_number;
     let add_event_tracking = init.add_event_tracking;
-    let add_session_tracking = init.add_session_tracking; 
     let add_mouse_tracking = init.add_mouse_tracking;
 
     let session = new Session();
@@ -17,7 +16,6 @@ const M_tracker = function(init){
     //If initialization variable 
     if(validInitialization){  
 
-        add_session_tracking && track_session_time();
         add_mouse_tracking && track_mouse();
 
         run_batch();
@@ -46,7 +44,7 @@ const M_tracker = function(init){
                 }
                 
                 current_page.unload_time = getCurrentTime();
-                session.push(current_page);
+                session.data.push(current_page);
                 current_page = new Page(page);
 
             },
@@ -69,24 +67,6 @@ const M_tracker = function(init){
 
         alert("Account number required!")
         return null;
-
-    }
-
-    //Track time between site load and unload
-    function track_session_time(){
-
-        let load_time;
-        let unload_time;
-    
-        window.addEventListener('load', (event) => {
-            load_time = new Date();
-        });
-
-        window.addEventListener('beforeunload', (event) => {
-            unload_time = new Date();
-            diff = new Date(unload_time-load_time);
-            socket.send(JSON.stringify(format_session_time(diff)));
-        });
 
     }
 
@@ -113,16 +93,18 @@ const M_tracker = function(init){
         //Send data every 30 seconds
         setInterval(() => {
             let current_page_copy = Object.assign({}, current_page);
-            session.push(current_page_copy);
+            session.data.push(current_page_copy);
             console.log("session "+ JSON.stringify(session));
-            socket.send(format_session_data(session));
+            socket.send(format_session(session));
             clear_data();
         }, 10000)
 
         //If page is closed before 30 second interval elapses, send all data
         window.addEventListener('beforeunload', (event) => {
-            session.push(current_page);
-            socket.send(format_session_data(session));
+            current_page.unload_time = getCurrentTime();
+            session.unload_time = getCurrentTime();
+            session.data.push(current_page);
+            socket.send(format_session(session));
         });
 
     }
@@ -137,17 +119,7 @@ const M_tracker = function(init){
 
     //------------FORMATTING METHODS--------------//
 
-    function format_session_time(time){
-
-        return {
-            header: "POST /userdata/session_time?account_num=" +account_number+" HTTP/1.1",
-            content_type: "application/http",
-            body: time.getSeconds()
-        }
-
-    }
-
-    function format_session_data(data){
+    function format_session(data){
 
         return {
             header: "POST /userdata/session_data?account_num=" +account_number+" HTTP/1.1",
@@ -172,7 +144,7 @@ const M_tracker = function(init){
     function Session(){
 
         this.load_time = getCurrentTime();
-        this.track_session_time = null;
+        this.unload_time = null;
         this.data = [];
     }
 
