@@ -8,11 +8,16 @@ Two possible data structures:
 - An array (or object?) called site_session
 - Each element in site_session represents a page_session
 - Page_session is an object with properties:
-    - Position data
+    - Hover data
     - Event data
     - Load time 
     - Unload time
     - Unique ID?
+
+Hover data (replacement for position data):
+- User must specify:
+    - id/class 
+    - how long mouse has been hovering above specified element 
 
 Keep in mind the backend:
 - Because we're ingesting analytics data, we'd use a flexible non-relational database -> MongoDB? (Document-based data)
@@ -27,7 +32,7 @@ https://support.microsoft.com/en-us/office/database-design-basics-eb2159cf-1e30-
 Non-relational DB Design:
 
 Collections: 
-- Accounts -Site_Sessions -Page_Sessions -EventData? -PositionData?
+- Accounts -Site_Sessions -Page_Sessions -EventData? -HoverData?
 
 Site_Sessions = {
     _id: unique_val,

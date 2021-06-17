@@ -2,7 +2,7 @@ const M_tracker = function(init){
 
     let account_number = init.account_number;
     let add_event_tracking = init.add_event_tracking;
-    let add_mouse_tracking = init.add_mouse_tracking;
+    let add_hover_tracking = init.add_hover_tracking;
 
     let session = new Session();
     let current_page = new Page('Home'); 
@@ -14,13 +14,13 @@ const M_tracker = function(init){
     //If configured correctly, return object method API
     if(validInitialization){  
 
-        add_mouse_tracking && track_mouse();
+        add_hover_tracking && track_hover();
 
         run_batch();
 
         return {
             //If tracking is enabled and operation is supported, push ['operation', 'descriptor'] to batch
-            track : (elem) => {      
+            track_click : (elem) => {      
 
                 if(!add_event_tracking){
                     return;
@@ -31,6 +31,14 @@ const M_tracker = function(init){
                 }
                 
                 current_page.event_data.push(elem);
+
+            },
+
+            //Arg 1: identifier
+            //Arg 2: time interval
+            track_hover : (identifier, interval) => {
+
+                
 
             },
 
@@ -56,8 +64,8 @@ const M_tracker = function(init){
                 console.log("Initial load: " + current_page.load_time);
             },
 
-            view_position_data : () => {
-                console.log("Position batch: "+JSON.stringify(current_page.position_data));
+            view_hover_data : () => {
+                console.log("Hover data: "+JSON.stringify(current_page.hover_data));
             }
         }
     }
@@ -69,7 +77,7 @@ const M_tracker = function(init){
     }
 
     //Track mouse position
-    function track_mouse(){
+    function track_hover(){
 
         window.addEventListener('mousemove', record_position);
         window.addEventListener('mouseenter', record_position);
@@ -77,10 +85,10 @@ const M_tracker = function(init){
 
     }
 
-    //Callback that pushes [x-coordinate, y-coordinate] to current_page.position_data
+    //Callback that pushes [x-coordinate, y-coordinate] to current_page.hover_data
     function record_position(event){
 
-        current_page.position_data.push([event.pageX, event.pageY]);
+        current_page.hover_data.push([event.pageX, event.pageY]); //CHANGE ME
 
     }
 
@@ -121,7 +129,7 @@ const M_tracker = function(init){
 
         session.data = [];
         current_page.event_data = [];
-        current_page.position_data = [];
+        current_page.hover_data = [];
 
     }
 
@@ -145,7 +153,7 @@ const M_tracker = function(init){
         this.load_time = getCurrentTime();
         this.unload_time =  null;
         this.event_data = [];
-        this.position_data = [];
+        this.hover_data = [];
 
     }
 
