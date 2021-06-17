@@ -97,9 +97,8 @@ const M_tracker = function(init){
             let current_page_copy = Object.assign({}, current_page);
             session.data.push(current_page_copy);
             console.log("session "+ JSON.stringify(session));
-            socket.send(format_session(session));
+            socket.send(JSON.stringify(format_session(session)));
             clear_data();
-
 
         }, 10000)
 
