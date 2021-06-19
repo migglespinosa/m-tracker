@@ -15,7 +15,6 @@ const M_tracker = function(init){
     if(validInitialization){  
 
         add_hover_tracking && track_hover();
-
         run_batch();
 
         return {
@@ -34,13 +33,7 @@ const M_tracker = function(init){
 
             },
 
-            //Arg 1: identifier
-            //Arg 2: time interval
-            track_hover : (identifier, interval) => {
-
-                
-
-            },
+            track_hover : track_hover,
 
             //Adds a new page to page_session_data
             page_change : (page) => {
@@ -76,19 +69,75 @@ const M_tracker = function(init){
 
     }
 
-    //Track mouse position
-    function track_hover(){
+    //Identify an element and set a timer for how long a mouse
+    //hovers over it to push in page data
+    function track_hover(identifier, time){
 
-        window.addEventListener('mousemove', record_position);
-        window.addEventListener('mouseenter', record_position);
-        window.addEventListener('mouseleave', record_position);
+        //Default time is 3 sec
+        if(!time){
+            time = 3000;
+        }
+
+        //Element is set according to REGEX pattern.
+        if(identifier.charAt(0) == "."){
+            monitor_element_id(identifier, time);
+        }
+        else if(identifier.charAt(0) == "#"){
+            monitor_elements_class(identifier, time);
+        }
+        else{
+            console.log("element not found")
+            return;
+        }
+    }
+
+    function monitor_element_id(identifier, time){
+
+        let enter_time;
+        let exit_time;
+
+        identifier = identifier.slice(1);
+        element = document.getElementsByClassName(identifier);
+
+        element.addEventListener('mouseenter', (event) => {
+            enter_time = event.timeStamp;
+            console.log("mouseenter timestamp: "+enter_time);
+            setTimeout(() => {
+               ( exit_time-enter_time >= time|| exit_time == null) && current_page.hover_data.push("Object hovered");
+            }, time);
+        });
+
+        element.addEventListener('mouseleave', (event) => {
+            exit_time = event.timeStamp;
+        });
 
     }
 
-    //Callback that pushes [x-coordinate, y-coordinate] to current_page.hover_data
-    function record_position(event){
+    function monitor_elements_class(identifier, time){
 
-        current_page.hover_data.push([event.pageX, event.pageY]); //CHANGE ME
+        identifier = identifier.slice(1);
+        elements = document.getElementsByClassName(identifier);
+
+        console.log("Elements "+ JSON.stringify(elements))
+
+        elements.forEach((element) => {
+
+            let enter_time;
+            let exit_time;
+
+            element.addEventListener('mouseenter', (event) => {
+                enter_time = event.timeStamp;
+                console.log("mouseenter timestamp: "+enter_time);
+                setTimeout(() => {
+                Console.log("Class element hovered")
+                ( exit_time-enter_time >= time|| exit_time == null) && current_page.hover_data.push("Object hovered");
+                }, time);
+            })
+
+            element.addEventListener('mouseleave', (event) => {
+                exit_time = event.timeStamp;
+            });
+        })
 
     }
 
