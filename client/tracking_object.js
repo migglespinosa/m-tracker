@@ -93,8 +93,8 @@ const M_tracker = function(init){
 
     function monitor_element_id(identifier, time){
 
-        identifier = identifier.slice(1);
-        element = document.getElementById(identifier);
+        search_identifier = identifier.slice(1);
+        element = document.getElementById(search_identifier);
 
         element.addEventListener('mouseenter', (event) => {
 
@@ -109,7 +109,8 @@ const M_tracker = function(init){
 
             setTimeout(() => {
                 if(exit_time == null || exit_time-enter_time >= time){
-                    current_page.hover_data.push("Object hovered");
+                    hover_event = new Hover_Event(identifier, enter_time); 
+                    current_page.hover_data.push(hover_event);
                 }
             }, time);
         });
@@ -117,8 +118,8 @@ const M_tracker = function(init){
 
     function monitor_elements_class(identifier, time){
 
-        identifier = identifier.slice(1);
-        collection = document.getElementsByClassName(identifier);
+        search_identifier = identifier.slice(1);
+        collection = document.getElementsByClassName(search_identifier);
         elements = Array.prototype.slice.call(collection);
 
         elements.forEach((element) => {
@@ -128,20 +129,23 @@ const M_tracker = function(init){
                 let enter_time;
                 let exit_time;
 
+                enter_time = event.timeStamp;
+
                 element.addEventListener('mouseleave', (event) => {
                     exit_time = event.timeStamp;
                 });
 
                 setTimeout(() => {
                     if(exit_time == null || exit_time-enter_time >= time){
-                        current_page.hover_data.push("Class object hovered");
+                        hover_event = new Hover_Event(identifier, enter_time); 
+                        current_page.hover_data.push(hover_event);
                     }
                 }, time);
 
             })
         })
     }
-    
+
     //------------BATCH METHODS------------//
 
     function run_batch(){
@@ -151,7 +155,7 @@ const M_tracker = function(init){
 
             //1. Copy state of current_page and push into session.data
             //2. Send session to WebSocket
-            //3. Clear recently posted data to save memory
+            //3. Clear recently posted data 
             let current_page_copy = Object.assign({}, current_page);
             session.data.push(current_page_copy);
             console.log("session "+ JSON.stringify(session));
@@ -212,6 +216,12 @@ const M_tracker = function(init){
         this.load_time = getCurrentTime();
         this.unload_time = null;
         this.data = [];
+
+    }
+
+    function Hover_Event(identifier, load_time){
+        this.load_time = load_time;
+        this.identifier = identifier;
     }
 
 }
