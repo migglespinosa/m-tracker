@@ -118,30 +118,41 @@ const M_tracker = function(init){
     function monitor_elements_class(identifier, time){
 
         identifier = identifier.slice(1);
-        elements = document.getElementsByClassName(identifier);
-
-        console.log("Elements "+ JSON.stringify(elements))
+        collection = document.getElementsByClassName(identifier);
+        elements = Array.prototype.slice.call(collection);
 
         elements.forEach((element) => {
 
-            let enter_time;
-            let exit_time;
-
             element.addEventListener('mouseenter', (event) => {
-                enter_time = event.timeStamp;
-                console.log("mouseenter timestamp: "+enter_time);
+
+                let enter_time;
+                let exit_time;
+
+                element.addEventListener('mouseleave', (event) => {
+                    exit_time = event.timeStamp;
+                });
+
                 setTimeout(() => {
-                Console.log("Class element hovered")
-                ( exit_time-enter_time >= time|| exit_time == null) && current_page.hover_data.push("Object hovered");
+                    if(exit_time == null || exit_time-enter_time >= time){
+                        current_page.hover_data.push("Class object hovered");
+                    }
                 }, time);
+
             })
-
-            element.addEventListener('mouseleave', (event) => {
-                exit_time = event.timeStamp;
-            });
         })
-
     }
+
+    /*
+    function htmlCollection_to_array(collection){
+        const length = collection.length;
+        for(){
+
+        }
+        return{
+
+        }
+    }
+    */
 
     //------------BATCH METHODS------------//
 
