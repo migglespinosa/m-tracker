@@ -68,9 +68,9 @@ const M_tracker = function(init){
         return null;
 
     }
-
-    //Identify an element and set a timer for how long a mouse
-    //hovers over it to push in page data
+    //ARGS: 
+    //Identify an element by with a css class or id selector.
+    //Set a timer for how long a mouse can hover over the element until hover_data is updated
     function track_hover(identifier, time){
 
         //Default time is 3 sec
@@ -78,7 +78,7 @@ const M_tracker = function(init){
             time = 3000;
         }
 
-        //Element is set according to REGEX pattern.
+        //Check first character to determine if identifier is class or id selector
         if(identifier.charAt(0) == "#"){
             monitor_element_id(identifier, time);
         }
@@ -93,21 +93,28 @@ const M_tracker = function(init){
 
     function monitor_element_id(identifier, time){
 
+        //Find element by id
         search_identifier = identifier.slice(1);
         element = document.getElementById(search_identifier);
 
+        //When a mouse hovers over the specified element,
+        //setTimeout to trigger in 'time' seconds.
         element.addEventListener('mouseenter', (event) => {
 
             let enter_time;
             let exit_time;
 
-            enter_time = event.timeStamp;
-            
+            enter_time = event.timeStamp; 
+
             element.addEventListener('mouseleave', (event) => {
                 exit_time = event.timeStamp;
             });
 
             setTimeout(() => {
+
+                //If mouse hasn't exited the element region
+                //or if the diff between exit and enter times is >= time
+                //update current_page.hover_data
                 if(exit_time == null || exit_time-enter_time >= time){
                     hover_event = new Hover_Event(identifier, enter_time); 
                     current_page.hover_data.push(hover_event);
@@ -118,12 +125,15 @@ const M_tracker = function(init){
 
     function monitor_elements_class(identifier, time){
 
+        //Find elements by class-name
         search_identifier = identifier.slice(1);
         collection = document.getElementsByClassName(search_identifier);
-        elements = Array.prototype.slice.call(collection);
+        elements = Array.prototype.slice.call(collection); //Converts HTMLcollection into an Array
 
         elements.forEach((element) => {
 
+            //When a mouse hovers over the specified element,
+            //setTimeout to trigger in 'time' seconds.
             element.addEventListener('mouseenter', (event) => {
 
                 let enter_time;
@@ -135,6 +145,9 @@ const M_tracker = function(init){
                     exit_time = event.timeStamp;
                 });
 
+                //If mouse hasn't exited the element region
+                //or if the diff between exit and enter times is >= time
+                //update current_page.hover_data
                 setTimeout(() => {
                     if(exit_time == null || exit_time-enter_time >= time){
                         hover_event = new Hover_Event(identifier, enter_time); 
@@ -220,8 +233,10 @@ const M_tracker = function(init){
     }
 
     function Hover_Event(identifier, load_time){
+
         this.load_time = load_time;
         this.identifier = identifier;
+
     }
 
 }
