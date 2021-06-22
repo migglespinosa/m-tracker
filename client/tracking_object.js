@@ -141,19 +141,7 @@ const M_tracker = function(init){
             })
         })
     }
-
-    /*
-    function htmlCollection_to_array(collection){
-        const length = collection.length;
-        for(){
-
-        }
-        return{
-
-        }
-    }
-    */
-
+    
     //------------BATCH METHODS------------//
 
     function run_batch(){
