@@ -79,10 +79,10 @@ const M_tracker = function(init){
         }
 
         //Element is set according to REGEX pattern.
-        if(identifier.charAt(0) == "."){
+        if(identifier.charAt(0) == "#"){
             monitor_element_id(identifier, time);
         }
-        else if(identifier.charAt(0) == "#"){
+        else if(identifier.charAt(0) == "."){
             monitor_elements_class(identifier, time);
         }
         else{
@@ -93,24 +93,26 @@ const M_tracker = function(init){
 
     function monitor_element_id(identifier, time){
 
-        let enter_time;
-        let exit_time;
-
         identifier = identifier.slice(1);
-        element = document.getElementsByClassName(identifier);
+        element = document.getElementById(identifier);
 
         element.addEventListener('mouseenter', (event) => {
+
+            let enter_time;
+            let exit_time;
+
             enter_time = event.timeStamp;
-            console.log("mouseenter timestamp: "+enter_time);
+            
+            element.addEventListener('mouseleave', (event) => {
+                exit_time = event.timeStamp;
+            });
+
             setTimeout(() => {
-               ( exit_time-enter_time >= time|| exit_time == null) && current_page.hover_data.push("Object hovered");
+                if(exit_time == null || exit_time-enter_time >= time){
+                    current_page.hover_data.push("Object hovered");
+                }
             }, time);
         });
-
-        element.addEventListener('mouseleave', (event) => {
-            exit_time = event.timeStamp;
-        });
-
     }
 
     function monitor_elements_class(identifier, time){
