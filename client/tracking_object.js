@@ -7,7 +7,7 @@ const M_tracker = function(init){
     let session = new Session();
     let current_page = new Page('Home'); 
 
-    const url = 'ws://localhost:8080';
+    const url = 'wss://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
     const validInitialization = account_number != null; //Account number required
 
@@ -216,7 +216,7 @@ const M_tracker = function(init){
 
     function Page(name){
 
-        this.name = name;
+        this.page_name = name;
         this.load_time = getCurrentTime();
         this.unload_time =  null;
         this.event_data = [];

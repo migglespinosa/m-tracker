@@ -9,15 +9,15 @@ const session = message.body;
 session.data.forEach(elem => {
 
     //Send data to respective collections in MongoDB
-    if(elem.name.includes("Home")){
+    if(elem.page_name.includes("Home")){
         parentPort.postMessage(elem);
     }
 
-    if(elem.name.includes("Page A")){
+    if(elem.page_name.includes("Page A")){
         parentPort.postMessage(elem);
     }
 
-    if(elem.name.includes("Page B")){
+    if(elem.page_name.includes("Page B")){
         parentPort.postMessage(elem);
     }
     

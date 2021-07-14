@@ -5,6 +5,11 @@ const socket = new WebSocket.Server({
     port: 8080
 })
 
+//TIP: To only allow GET, POST access from a certain domain, read these:
+//https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+//https://www.freecodecamp.org/news/how-to-secure-your-websocket-connections-d0be0996c556/
+//https://www.neuralegion.com/blog/websocket-security-top-vulnerabilities/
+
 //If SSL handshake is successful, output "ws connection initiated"
 socket.on("connection", function(ws){
 
