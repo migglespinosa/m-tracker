@@ -50,3 +50,31 @@ Page_Sessions = {
     site_session: site_sessions_.ID
     event_data: 
 }
+
+####### MongoDB Recommended Data Modeling Concepts #######
+
+According to https://docs.mongodb.com/manual/core/data-modeling-introduction/:
+
+- One-to-one, one-to-many relationships should follow embedded, non-normalized model
+- Embedded model enables more efficient atomic operations
+- Follow subset patterns to reduce collection size at the expense of higher maintanance costs, more difficult
+"JOIN" operations, and potential data duplication
+- Use reference model if the cost of data publication exceeds the benefits of performance
+
+- Current plan:
+- Use an embedded data model for Session -> Page -> HoverData
+- Follow subset pattern for Sessions, where Sessions older than a day are put into a historical collection of 
+- sessions
+- Don't follow a subset pattern where we create a new collection for less accessed fields
+
+- Future data object models:
+    - Account settings 
+    - Session reference data:
+        - One pointer to data less than 10 days old
+        - One pointer to data more than 10 days old
+
+Questions to consider:
+- How to automate testing?
+- Which cloud provider should I use?
+    
+
