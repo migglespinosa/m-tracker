@@ -5,6 +5,17 @@ const socket = new WebSocket.Server({
     port: 8080
 })
 
+/*
+const { MongoClient } = require('mongodb');
+const uri = "mongodb+srv://tracker-master:<password>@cluster0.bksvx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+client.connect(err => {
+  const collection = client.db("test").collection("devices");
+  // perform actions on the collection object
+  client.close();
+});
+*/
+
 //TIP: To only allow GET, POST access from a certain domain, read these:
 //https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 //https://www.freecodecamp.org/news/how-to-secure-your-websocket-connections-d0be0996c556/
