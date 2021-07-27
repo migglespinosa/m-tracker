@@ -1,20 +1,10 @@
 const WebSocket = require('ws');
 const {Worker, workerData} = require('worker_threads');
+const { TEST_ENV } = require('./config.js');
 
 const socket = new WebSocket.Server({
     port: 8080
 })
-
-/*
-const { MongoClient } = require('mongodb');
-const uri = "mongodb+srv://tracker-master:<password>@cluster0.bksvx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
-*/
 
 //TIP: To only allow GET, POST access from a certain domain, read these:
 //https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -25,6 +15,7 @@ client.connect(err => {
 socket.on("connection", function(ws){
 
     console.log("Connection successful")
+    console.log("Test ENV is ", TEST_ENV)
 
     //If WS message received, output payload data
     ws.on("message", function(message){

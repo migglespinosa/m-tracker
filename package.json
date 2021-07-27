@@ -1,0 +1,26 @@
+{
+  "name": "m-tracker",
+  "version": "1.0.0",
+  "description": "M-tracker requirements: - Heatmap  - Session length  - Event tracking",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "mongodb": "^4.0.1",
+    "ws": "^7.4.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/migglespinosa/m-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/migglespinosa/m-tracker/issues"
+  },
+  "homepage": "https://github.com/migglespinosa/m-tracker#readme"
+}
