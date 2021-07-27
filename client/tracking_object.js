@@ -25,11 +25,8 @@ const M_tracker = function(init){
                     return;
                 }
                 
-                if(!supportedOperation(elem)){
-                    return;
-                }
-                
-                current_page.event_data.push(elem);
+                click = new Click_Event(elem);
+                current_page.click_data.push(click);
 
             },
 
@@ -49,8 +46,8 @@ const M_tracker = function(init){
             },
 
             //----------TEST METHODS-------------//
-            view_event_data : () => {
-                console.log(JSON.stringify(current_page.event_data));
+            view_click_data : () => {
+                console.log(JSON.stringify(current_page.click_data));
             },
 
             view_loadtime : () => {
@@ -195,7 +192,7 @@ const M_tracker = function(init){
     function clear_data(){
 
         session.data = [];
-        current_page.event_data = [];
+        current_page.click_data = [];
         current_page.hover_data = [];
 
     }
@@ -219,7 +216,7 @@ const M_tracker = function(init){
         this.page_name = name;
         this.load_time = getCurrentTime();
         this.unload_time =  null;
-        this.event_data = [];
+        this.click_data = [];
         this.hover_data = [];
 
     }
@@ -239,12 +236,14 @@ const M_tracker = function(init){
 
     }
 
+    function Click_Event(identifier){
+
+        this.load_time = getCurrentTime();
+        this.identifier = identifier;
+
+    }
+
 }
-
-//---------------HELPER DATA-------------------//
-
-//Supported operations
-const operations = ['track', 'send_batch'];
 
 //---------------HELPER METHODS----------------//
 
