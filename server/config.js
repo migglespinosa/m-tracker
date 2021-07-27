@@ -14,5 +14,5 @@ if (result.error) {
 }
 
 module.exports = {
-    TEST_ENV: process.env.TEST_ENV,
+  MONGO_DB_PASSWORD : process.env.MONGO_DB_PASSWORD,
 };

@@ -1,6 +1,5 @@
 const WebSocket = require('ws');
 const {Worker, workerData} = require('worker_threads');
-const { TEST_ENV } = require('./config.js');
 
 const socket = new WebSocket.Server({
     port: 8080
@@ -15,7 +14,6 @@ const socket = new WebSocket.Server({
 socket.on("connection", function(ws){
 
     console.log("Connection successful")
-    console.log("Test ENV is ", TEST_ENV)
 
     //If WS message received, output payload data
     ws.on("message", function(message){

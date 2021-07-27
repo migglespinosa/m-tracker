@@ -1,17 +1,16 @@
 const {workerData, parentPort} = require('worker_threads');
 const { MongoClient } = require('mongodb');
+const { MONGO_DB_PASSWORD } = require('./config.js');
 
-/*
-const password = 
-const uri = "mongodb+srv://tracker-master:<password>@cluster0.bksvx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const uri = "mongodb+srv://tracker-master:"
+const path = MONGO_DB_PASSWORD + "@cluster0.bksvx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+
+const client = new MongoClient(uri + path, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const collection = client.db("test").collection("devices");
   // perform actions on the collection object
   client.close();
 });
-*/
-
 
 //Parse data into JSON
 const message = JSON.parse(workerData);
