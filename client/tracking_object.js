@@ -4,7 +4,7 @@ const M_tracker = function(init){
     let add_event_tracking = init.add_event_tracking;
     let add_hover_tracking = init.add_hover_tracking;
 
-    let session = new Site_Session();
+    let session = new Site_Session(account_number);
     let current_page = new Page_Session('Home'); 
 
     const url = 'ws://localhost:8080';
@@ -40,7 +40,7 @@ const M_tracker = function(init){
                 }
                 
                 current_page.unload_time = getCurrentTime();
-                session.data.push(current_page);
+                session.page_sessions.push(current_page);
                 current_page = new Page_Session(page);
 
             },
@@ -163,11 +163,11 @@ const M_tracker = function(init){
         //Sends data every 30 seconds
         setInterval(() => {
 
-            //1. Copy state of current_page and push into session.data
+            //1. Copy state of current_page and push into session.page_sessions
             //2. Send session to WebSocket
             //3. Clear recently posted data 
             let current_page_copy = Object.assign({}, current_page);
-            session.data.push(current_page_copy);
+            session.page_sessions.push(current_page_copy);
             console.log("session "+ JSON.stringify(session));
             socket.send(JSON.stringify(format_session(session)));
             clear_data();
@@ -182,7 +182,7 @@ const M_tracker = function(init){
             //3. Send session to WebSocket
             current_page.unload_time = getCurrentTime();
             session.unload_time = getCurrentTime();
-            session.data.push(current_page);
+            session.page_sessions.push(current_page);
             socket.send(format_session(session));
         });
 
@@ -191,7 +191,7 @@ const M_tracker = function(init){
     //Clears disposable data
     function clear_data(){
 
-        session.data = [];
+        session.page_sessions = [];
         current_page.click_data = [];
         current_page.hover_data = [];
 
@@ -221,8 +221,9 @@ const M_tracker = function(init){
 
     }
 
-    function Site_Session(){
+    function Site_Session(account_number){
 
+        this.account_number = account_number;
         this.load_time = getCurrentTime();
         this.unload_time = null;
         this.page_sessions = [];
@@ -238,7 +239,7 @@ const M_tracker = function(init){
 
     function Click_Event(identifier){
 
-        this.load_time = getCurrentTime();
+        this.click_time = getCurrentTime();
         this.identifier = identifier;
 
     }

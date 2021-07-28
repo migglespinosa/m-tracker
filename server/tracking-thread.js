@@ -11,8 +11,14 @@ const client = new MongoClient(uri + path, { useNewUrlParser: true, useUnifiedTo
 const message = JSON.parse(workerData);
 const session = message.body;
 
+const time_stamp = session.load_time;
+const account_num = session.account_number;
+
 //Send data to MongoDB
 async function write_data(){
+
+    console.log("time_stamp: ", time_stamp)
+    console.log("account_num: ", account_num)
 
     try{
         //Insert a document to database "db_test" in collection "collection_test"
@@ -26,5 +32,18 @@ async function write_data(){
         console.error(error);
     }
 }
+
+/*
+Potential algorithm for updating a session in mongodb:
+- Find if site_session document already exists by looking for an account number + load time match.
+- If doesn't exist, add body
+- Else:
+    - Grab most the recent page-session in workerData 
+    - Find site-session by account number + load time 
+    and return most recent page-session in the mongoDB   
+    - Check if page-sessions' name and load times match
+        - If matching, append click-data and hover-data to MongoDB page-session
+        - Else, append entire page-session to MongoDB
+*/
 
 write_data();
