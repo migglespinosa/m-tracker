@@ -4,8 +4,8 @@ const M_tracker = function(init){
     let add_event_tracking = init.add_event_tracking;
     let add_hover_tracking = init.add_hover_tracking;
 
-    let session = new Session();
-    let current_page = new Page('Home'); 
+    let session = new Site_Session();
+    let current_page = new Page_Session('Home'); 
 
     const url = 'ws://localhost:8080';
     const socket = new WebSocket(url); //Open WebSocket connection
@@ -41,7 +41,7 @@ const M_tracker = function(init){
                 
                 current_page.unload_time = getCurrentTime();
                 session.data.push(current_page);
-                current_page = new Page(page);
+                current_page = new Page_Session(page);
 
             },
 
@@ -211,7 +211,7 @@ const M_tracker = function(init){
 
     //----------------OBJECT CONSTRUCTORS---------------//
 
-    function Page(name){
+    function Page_Session(name){
 
         this.page_name = name;
         this.load_time = getCurrentTime();
@@ -221,11 +221,11 @@ const M_tracker = function(init){
 
     }
 
-    function Session(){
+    function Site_Session(){
 
         this.load_time = getCurrentTime();
         this.unload_time = null;
-        this.data = [];
+        this.page_sessions = [];
 
     }
 
