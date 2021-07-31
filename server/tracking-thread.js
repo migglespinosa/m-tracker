@@ -28,8 +28,8 @@ async function write_data(){
         const site_session_filter = site_session_query;
         const site_session_update = {
             $push: {
-                "page_sessions.$[page].click_data": oldest_page_session_click_data,
-                "page_sessions.$[page].hover_data": oldest_page_session_hover_data
+                "page_sessions.$[page].click_data": {"$each": oldest_page_session_click_data},
+                "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data}
             }
         } 
         const options = {
@@ -51,7 +51,7 @@ async function write_data(){
             console.log(`A document was inserted with the _id: ${result.insertedId}`);
         }
         else{
-            const result = await movies.updateOne(site_session_filter, site_session_update, options);
+            const result = await collection_test.updateOne(site_session_filter, site_session_update, options);
             console.log("Result: ", result);
         }
 
