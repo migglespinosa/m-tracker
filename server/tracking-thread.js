@@ -19,22 +19,32 @@ const oldest_page_session_page_name = site_session.page_sessions[0].page_name;
 const oldest_page_session_hover_data = site_session.page_sessions[0].hover_data;
 const oldest_page_session_click_data = site_session.page_sessions[0].click_data;
 
+let remaining_page_sessions;
+if(site_session.page_sessions.length >= 1){
+    remaining_page_sessions = site_session.page_sessions.slice(1);
+}
+
+console.log("oldest_page_session_click_data", oldest_page_session_click_data);
+
 //Write data to MongoDB
 async function write_data(){
 
     try{
-        
         //Get site_session document where document.load_time is equal to load_time and document.account_number is equal to account_number
         const site_session_query = { $and: [{load_time: {$eq: load_time}}, {account_number: {$eq: account_number}}]};
         const site_session_filter = site_session_query;
         
-        //Append click_data and hover_data of the oldest page session sumbitted to thread to the most recent page session in MongoDB
+        //Append click_data and hover_data of the oldest page session sumbitted to the thread to the most recent page session in MongoDB
         const site_session_update = {
             $push: {
                 "page_sessions.$[page].click_data": {"$each": oldest_page_session_click_data},
-                "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data}
+                "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data},
             }
         } 
+
+        if(site_session.page_sessions.length >= 1){
+            site_session_update['$push']['page_sessions'] =  {"$each": remaining_page_sessions}
+        }
 
         //Find the page_session whose load_time and page_name are equal to the submitted oldest page sessions's load_time and page_time
         const options = {
@@ -49,7 +59,6 @@ async function write_data(){
         const db_test = client.db("db_test");
         const collection_test = db_test.collection("collection_test");
         const site_session_result = await collection_test.findOne(site_session_query);
-        console.log("site_session_result:", site_session_result);
 
         //If site_session can't be found in MongoDB, post the site_session submitted by the thread
         //Else, update respective document
