@@ -13,25 +13,30 @@ const site_session = message.body;
 const load_time = site_session.load_time;
 const account_number = site_session.account_number;
 
+//Grab load_time and page_time of the oldest page_session submitted to thread
 const oldest_page_session_load_time = site_session.page_sessions[0].load_time;
 const oldest_page_session_page_name = site_session.page_sessions[0].page_name;
 const oldest_page_session_hover_data = site_session.page_sessions[0].hover_data;
 const oldest_page_session_click_data = site_session.page_sessions[0].click_data;
 
-//Send data to MongoDB
+//Write data to MongoDB
 async function write_data(){
 
     try{
-
+        
+        //Get site_session document where document.load_time is equal to load_time and document.account_number is equal to account_number
         const site_session_query = { $and: [{load_time: {$eq: load_time}}, {account_number: {$eq: account_number}}]};
-        const site_session_projection = {page_sessions: { $slice: -1}};
         const site_session_filter = site_session_query;
+        
+        //Append click_data and hover_data of the oldest page session sumbitted to thread to the most recent page session in MongoDB
         const site_session_update = {
             $push: {
                 "page_sessions.$[page].click_data": {"$each": oldest_page_session_click_data},
                 "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data}
             }
         } 
+
+        //Find the page_session whose load_time and page_name are equal to the submitted oldest page sessions's load_time and page_time
         const options = {
             arrayFilters: [{
                 "page.load_time" : oldest_page_session_load_time,
@@ -46,13 +51,15 @@ async function write_data(){
         const site_session_result = await collection_test.findOne(site_session_query);
         console.log("site_session_result:", site_session_result);
 
+        //If site_session can't be found in MongoDB, post the site_session submitted by the thread
+        //Else, update respective document
         if(!site_session_result){
             const result = await collection_test.insertOne(site_session);
             console.log(`A document was inserted with the _id: ${result.insertedId}`);
         }
         else{
             const result = await collection_test.updateOne(site_session_filter, site_session_update, options);
-            console.log("Result: ", result);
+            console.log("Document updated");
         }
 
     }
