@@ -30,21 +30,33 @@ console.log("oldest_page_session_click_data", oldest_page_session_click_data);
 async function write_data(){
 
     try{
+
         //Get site_session document where document.load_time is equal to load_time and document.account_number is equal to account_number
         const site_session_query = { $and: [{load_time: {$eq: load_time}}, {account_number: {$eq: account_number}}]};
         const site_session_filter = site_session_query;
         
         //Append click_data and hover_data of the oldest page session sumbitted to the thread to the most recent page session in MongoDB
-        const site_session_update = {
+        const site_session_update_click_hover = {
             $push: {
                 "page_sessions.$[page].click_data": {"$each": oldest_page_session_click_data},
                 "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data},
-            }
-        } 
 
-        if(site_session.page_sessions.length >= 1){
-            site_session_update['$push']['page_sessions'] =  {"$each": remaining_page_sessions}
+            }
         }
+        
+        const site_session_append_page = {
+            $push: {
+                "page_sessions": {"$each": remaining_page_sessions}
+            }
+        }
+
+        const operations = {
+            updateOne: { filter: site_session_filter, update: site_session_update_click_hover, upsert: true },
+            updateOne: { filter: site_session_filter, update: site_session_append_page, upsert: true }
+        }
+
+
+        console.log("site_session_update", site_session_update);
 
         //Find the page_session whose load_time and page_name are equal to the submitted oldest page sessions's load_time and page_time
         const options = {
@@ -67,7 +79,8 @@ async function write_data(){
             console.log(`A document was inserted with the _id: ${result.insertedId}`);
         }
         else{
-            const result = await collection_test.updateOne(site_session_filter, site_session_update, options);
+            //const result = await collection_test.updateOne(site_session_filter, site_session_update, options);
+            const result = await collection_test.bulkWrite([operations], options);
             console.log("Document updated");
         }
 
