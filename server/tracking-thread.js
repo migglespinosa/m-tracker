@@ -2,6 +2,8 @@ const {workerData, parentPort} = require('worker_threads');
 const { MongoClient } = require('mongodb');
 const { MONGO_DB_PASSWORD } = require('./config.js');
 
+//REMINDER: MongoDB driver has difficulty bulk updating fields of array elements in a document.
+
 //Initialize MongoDB client
 const uri = "mongodb+srv://tracker-master:"
 const path = MONGO_DB_PASSWORD + "@cluster0.bksvx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -13,11 +15,16 @@ const site_session = message.body;
 const load_time = site_session.load_time;
 const account_number = site_session.account_number;
 
-//Grab load_time and page_time of the oldest page_session submitted to thread
+//Grab load_time and page_name of the oldest page_session submitted to thread
 const oldest_page_session_load_time = site_session.page_sessions[0].load_time;
 const oldest_page_session_page_name = site_session.page_sessions[0].page_name;
 const oldest_page_session_hover_data = site_session.page_sessions[0].hover_data;
 const oldest_page_session_click_data = site_session.page_sessions[0].click_data;
+
+let oldest_page_session_unload_time;
+if(site_session.page_sessions.length > 1){
+    oldest_page_session_unload_time = site_session.page_sessions[0].unload_time;
+}
 
 let remaining_page_sessions;
 if(site_session.page_sessions.length >= 1){
@@ -39,8 +46,7 @@ async function write_data(){
         const site_session_update_click_hover = {
             $push: {
                 "page_sessions.$[page].click_data": {"$each": oldest_page_session_click_data},
-                "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data},
-
+                "page_sessions.$[page].hover_data": {"$each": oldest_page_session_hover_data}
             }
         }
         
@@ -49,19 +55,16 @@ async function write_data(){
                 "page_sessions": {"$each": remaining_page_sessions}
             }
         }
-
+        
         const operations = {
             updateOne: { filter: site_session_filter, update: site_session_update_click_hover, upsert: true },
             updateOne: { filter: site_session_filter, update: site_session_append_page, upsert: true }
         }
 
-
-        console.log("site_session_update", site_session_update);
-
         //Find the page_session whose load_time and page_name are equal to the submitted oldest page sessions's load_time and page_time
         const options = {
             arrayFilters: [{
-                "page.load_time" : oldest_page_session_load_time,
+                "page.load_time" : oldest_page_session_load_time, 
                 "page.page_name" : oldest_page_session_page_name
             }]
         };
@@ -80,6 +83,7 @@ async function write_data(){
         }
         else{
             //const result = await collection_test.updateOne(site_session_filter, site_session_update, options);
+            console.log("oldest_page_session_unload_time: ", oldest_page_session_unload_time)
             const result = await collection_test.bulkWrite([operations], options);
             console.log("Document updated");
         }
@@ -95,7 +99,8 @@ function new_data(site_session){
 
     if( (site_session.page_sessions.length == 1) &&
         (site_session.page_sessions[0].click_data.length == 0) && 
-        (site_session.page_sessions[0].hover_data.length == 0)){
+        (site_session.page_sessions[0].hover_data.length == 0) &&
+        (site_session.page_sessions[0].unload_time == null)){
         return false;
     }
     else{

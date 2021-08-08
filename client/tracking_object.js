@@ -216,6 +216,7 @@ const M_tracker = function(init){
         this.page_name = name;
         this.load_time = getCurrentTime();
         this.unload_time =  null;
+        this.test_field = "test"
         this.click_data = [];
         this.hover_data = [];
 

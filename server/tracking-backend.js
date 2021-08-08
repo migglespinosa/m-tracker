@@ -22,8 +22,8 @@ socket.on("connection", function(ws){
         //const oldest_page_session_click_data = data.page_sessions[0].click_data;
 
         //console.log("[message]: oldest_page_session_click_data", oldest_page_session_click_data)
-
-        console.log("Message: " + JSON.stringify(JSON.parse(message)));
+        //console.log("Message: " + JSON.stringify(JSON.parse(message)));
+        
         const worker = new Worker("./tracking-thread.js", {workerData: message});
         worker.on('message', (value) => {console.log("value: " + JSON.stringify(value))} );
         
